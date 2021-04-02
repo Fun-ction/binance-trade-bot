@@ -137,6 +137,27 @@ class AutoTrader:
             self.logger.info(f"Will be jumping from {coin} to {best_pair.to_coin_id}")
             self.transaction_through_bridge(best_pair, all_tickers)
 
+    def _jump_to_best_nonnotational_coin(self, coin: Coin, coin_price: float, all_tickers, owned_coins):
+        self.logger.info(f"{owned_coins}")
+
+        full_ratio_dict = self._get_ratios(coin, coin_price, all_tickers)
+        ratio_dict: Dict[Pair, float] = {}
+
+        for k, v in full_ratio_dict.items() :
+            # self.logger.info(f"{k}: {v} => ({v <= 0}, {k.to_coin.symbol not in owned_coins})")
+            if v <= 0 :
+                continue
+            if k.to_coin.symbol not in owned_coins :
+                ratio_dict[k] = v
+
+        self.logger.info(f"Ratio_dict:\n {ratio_dict} ")
+        if ratio_dict:
+            best_pair = max(ratio_dict, key = ratio_dict.get)
+            self.logger.info(f"Will be jumping from {coin} to {best_pair.to_coin_id}")
+            if self.transaction_through_bridge(best_pair, all_tickers):
+                owned_coins.remove(coin.symbol)
+                owned_coins.add(best_pair.to_coin.symbol)
+
     def bridge_scout(self):
         """
         If we have any bridge coin leftover, buy a coin with it that we won't immediately trade out of

@@ -136,14 +136,14 @@ class AutoTrader:
             self.logger.info(f"Will be jumping from {coin} to {best_pair.to_coin_id}")
             self.transaction_through_bridge(best_pair, all_tickers)
 
-    def _jump_to_best_nonnotational_coin(self, coin: Coin, coin_price: float, all_tickers, owned_coins):
+    def _jump_to_best_nonnotational_coin(self, coin: Coin, coin_price: float, all_tickers: AllTickers, owned_coins):
         self.logger.info(f"{owned_coins}")
 
         full_ratio_dict = self._get_ratios(coin, coin_price, all_tickers)
         ratio_dict: Dict[Pair, float] = {}
 
         for k, v in full_ratio_dict.items() :
-            # self.logger.info(f"{k}: {v} => ({v <= 0}, {k.to_coin.symbol not in owned_coins})")
+            self.logger.info(f"{k}: {v} => ({v <= 0}, {k.to_coin.symbol not in owned_coins})")
             if v <= 0 :
                 continue
             if k.to_coin.symbol not in owned_coins :
